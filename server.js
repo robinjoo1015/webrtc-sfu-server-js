@@ -32,10 +32,11 @@ const io = new Server(server, {
 //     allowEIO4: true,
 // })
 
+let wrtc = undefined
 if (process.platform === "darwin" && process.arch === "arm64") {
-    const wrtc = require("@koush/wrtc") //macOS+arm64
+    wrtc = require("@koush/wrtc") //macOS+arm64
 } else {
-    const wrtc = require("wrtc")
+    wrtc = require("wrtc")
 }
 
 
