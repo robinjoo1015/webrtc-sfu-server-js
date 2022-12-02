@@ -18,7 +18,6 @@ const io = new Server(server, {
     allowEIO4: true,
 })
 
-
 // const socketio = require("socket.io")(server, {
 //     cors: {
 //         origin: [
@@ -38,9 +37,6 @@ if (process.platform === "darwin" && process.arch === "arm64") {
 } else {
     wrtc = require("wrtc")
 }
-
-
-
 
 // const server = http.createServer(app);
 
@@ -72,6 +68,7 @@ let receiverPCs = {}
 let senderPCs = {}
 let users = {}
 let socketToRoom = {}
+let socketIDMap = {}
 
 const pc_config = {
     iceServers: [
@@ -125,6 +122,7 @@ const createReceiverPeerConnection = (socketID, socket, roomID) => {
     }
 
     receiverPCs[socketID] = pc
+    socketIDMap[socket.id] = socketID
 
     return pc
 }
@@ -334,8 +332,11 @@ io.on("connection", (socket) => {
     
     socket.on("disconnect", () => {
         try {
-            let roomID = socketToRoom[socket.id]
-            let socketID = socket.id
+            let socketID = socketIDMap[socket.id]
+            let roomID = socketToRoom[socketID]
+            // let roomID = socketToRoom[socket.id]
+            // let socketID = socket.id
+            
             console.log("disconnect", socketID, roomID)
 
             // deleteUser(socket.id, roomID)
