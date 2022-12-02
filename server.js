@@ -12,7 +12,7 @@ const io = new Server(server, {
         ],
         methods: ["GET", "POST"],
         transports: ['websocket', 'polling'],
-        credentials: true
+        // credentials: true
     },
     allowEIO3: true,
     allowEIO4: true,
