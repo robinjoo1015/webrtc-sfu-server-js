@@ -150,7 +150,7 @@ const createSenderPeerConnection = (
     pc.onicecandidate = (e) => {
         console.log(`socketID: (${receiverSocketID})'s senderPeerConnection icecandidate`)
         socket.to(receiverSocketID).emit("getReceiverCandidate", {
-            id:senderSocketID,
+            id: senderSocketID,
             candidate: e.candidate,
         })
         // console.log("emitted getReceiverCandidate", senderSocketID, receiverSocketID)
@@ -214,19 +214,27 @@ const closeSenderPCs = (socketID) => {
 
     if (!senderPCs[socketID]) return
 
-    senderPCs[socketID].forEach((senderPC) => {
-        senderPC.pc.close()
-        const eachSenderPC = senderPCs[senderPC.id].filter(
-            (sPC) => sPC.id === socketID
-        )[0]
-        if (!eachSenderPC) return
-        eachSenderPC.pc.close()
-        senderPCs[senderPC.id] = senderPCs[senderPC.id].filter(
-            (sPC) => sPC.id !== socketID
-        )
-    })
+    try {
+        senderPCs[socketID].forEach((senderPC) => {
+            senderPC.pc.close()
+            const eachSenderPC = senderPCs[senderPC.id].filter(
+                (sPC) => sPC.id === socketID
+            )[0]
+            if (!eachSenderPC) return
+            eachSenderPC.pc.close()
+            senderPCs[senderPC.id] = senderPCs[senderPC.id].filter(
+                (sPC) => sPC.id !== socketID
+            )
+        })
+    } catch (e) {
+        console.log(e)
+    }
 
-    delete senderPCs[socketID]
+    try {
+        delete senderPCs[socketID]
+    } catch (e) {
+        console.log(e)
+    }
 }
 
 // const io = socketio.listen(server); // ?
