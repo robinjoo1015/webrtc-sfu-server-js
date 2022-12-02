@@ -33,8 +33,10 @@ const io = new Server(server, {
 
 let wrtc = undefined
 if (process.platform === "darwin" && process.arch === "arm64") {
-    wrtc = require("@koush/wrtc") //macOS+arm64
+    console.log("running on @koush/wrtc")
+    wrtc = require("@koush/wrtc") // macOS + arm64
 } else {
+    console.log("running on wrtc")
     wrtc = require("wrtc")
 }
 
@@ -68,7 +70,7 @@ let receiverPCs = {}
 let senderPCs = {}
 let users = {}
 let socketToRoom = {}
-let socketIDMap = {}
+// let socketIDMap = {}
 
 const pc_config = {
     iceServers: [
@@ -122,7 +124,7 @@ const createReceiverPeerConnection = (socketID, socket, roomID) => {
     }
 
     receiverPCs[socketID] = pc
-    socketIDMap[socket.id] = socketID
+    // socketIDMap[socket.id] = socketID
 
     return pc
 }
@@ -240,6 +242,7 @@ const closeSenderPCs = (socketID) => {
 // const io = socketio.listen(server); // ?
 
 io.on("connection", (socket) => {
+    console.log(socket.id)
     socket.on("joinRoom", (data) => {
         try {
             let allUsers = getOtherUsersInRoom(data.id, data.roomID)
@@ -340,10 +343,10 @@ io.on("connection", (socket) => {
     
     socket.on("disconnect", () => {
         try {
-            let socketID = socketIDMap[socket.id]
+            // let socketID = socketIDMap[socket.id]
+            let socketID = socket.id
             let roomID = socketToRoom[socketID]
             // let roomID = socketToRoom[socket.id]
-            // let socketID = socket.id
             
             console.log("disconnect", socketID, roomID)
 
