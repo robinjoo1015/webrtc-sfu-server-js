@@ -12,7 +12,7 @@ const io = new Server(server, {
         ],
         methods: ["GET", "POST"],
         transports: ['websocket', 'polling'],
-        // credentials: true
+        credentials: true
     },
     allowEIO3: true,
     allowEIO4: true,
@@ -91,9 +91,9 @@ const isIncluded = (array, id) => array.some((item) => item.id === id)
 const createReceiverPeerConnection = async (socketID, socket, roomID) => {
     const pc = await new wrtc.RTCPeerConnection(pc_config)
 
-    pc.onicecandidate = async (e) => {
+    pc.onicecandidate = (e) => {
         console.log(`socketID: ${socketID}'s receiverPeerConnection icecandidate`)
-        await socket.to(socketID).emit("getSenderCandidate", {
+        socket.to(socketID).emit("getSenderCandidate", {
             candidate: e.candidate
         })
         // console.log("emitted getSenderCandidate", socketID)
@@ -103,10 +103,10 @@ const createReceiverPeerConnection = async (socketID, socket, roomID) => {
         console.log("ReceiverPeerConnection IceConnectionStateChange", pc.iceConnectionState, socketID)
     }
 
-    pc.ontrack = async (e) => {
+    pc.ontrack = (e) => {
         if (users[roomID]) {
             if (!isIncluded(users[roomID], socketID)) {
-                await users[roomID].push({
+                users[roomID].push({
                     id: socketID,
                     stream: e.streams[0],
                 })
@@ -120,7 +120,7 @@ const createReceiverPeerConnection = async (socketID, socket, roomID) => {
             ]
         }
 
-        await socket.broadcast.to(roomID).emit("userEnter", { id: socketID })
+        socket.broadcast.to(roomID).emit("userEnter", { id: socketID })
         // console.log("emitted userEnter", socketID)
     }
 
@@ -150,9 +150,9 @@ const createSenderPeerConnection = async (
     }
     // console.log("senderPC saved")
 
-    pc.onicecandidate = async (e) => {
+    pc.onicecandidate = (e) => {
         console.log(`socketID: (${receiverSocketID})'s senderPeerConnection icecandidate`)
-        await socket.to(receiverSocketID).emit("getReceiverCandidate", {
+        socket.to(receiverSocketID).emit("getReceiverCandidate", {
             id: senderSocketID,
             candidate: e.candidate,
         })
