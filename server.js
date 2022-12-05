@@ -88,12 +88,12 @@ const pc_config = {
 
 const isIncluded = (array, id) => array.some((item) => item.id === id)
 
-const createReceiverPeerConnection = (socketID, socket, roomID) => {
-    const pc = new wrtc.RTCPeerConnection(pc_config)
+const createReceiverPeerConnection = async (socketID, socket, roomID) => {
+    const pc = await new wrtc.RTCPeerConnection(pc_config)
 
     pc.onicecandidate = (e) => {
+        console.log(`socketID: ${socketID}'s receiverPeerConnection icecandidate`, e.candidate)
         if (!e.candidate) return;
-        console.log(`socketID: ${socketID}'s receiverPeerConnection icecandidate`)
         socket.to(socketID).emit("getSenderCandidate", {
             candidate: e.candidate
         })
@@ -130,17 +130,17 @@ const createReceiverPeerConnection = (socketID, socket, roomID) => {
     return pc
 }
 
-const createSenderPeerConnection = (
+const createSenderPeerConnection = async (
     receiverSocketID,
     senderSocketID,
     socket,
     roomID
 ) => {
     console.log("createSenderPeerConnection", senderSocketID, receiverSocketID)
-    const pc = new wrtc.RTCPeerConnection(pc_config)
+    const pc = await new wrtc.RTCPeerConnection(pc_config)
 
     if (senderPCs[senderSocketID]) {
-        senderPCs[senderSocketID].filter((user) => user.id !== receiverSocketID)
+        // senderPCs[senderSocketID].filter((user) => user.id !== receiverSocketID)
         senderPCs[senderSocketID].push({ id: receiverSocketID, pc })
     } else {
         senderPCs = {
@@ -294,8 +294,11 @@ io.on("connection", (socket) => {
     socket.on("senderCandidate", async (data) => {
         console.log("senderCandidate", data.senderSocketID)
         try {
-            let pc = receiverPCs[data.senderSocketID]
-            await pc.addIceCandidate(new wrtc.RTCIceCandidate(data.candidate))
+            /*
+            // let pc = receiverPCs[data.senderSocketID]
+            // await pc.addIceCandidate(new wrtc.RTCIceCandidate(data.candidate))
+            */
+            await receiverPCs[data.senderSocketID].addIceCandidate(await new wrtc.RTCIceCandidate(data.candidate))
         } catch (error) {
             // console.log('senderCandidate error')
             console.log(error);
@@ -331,11 +334,11 @@ io.on("connection", (socket) => {
     socket.on("receiverCandidate", async (data) => {
         console.log("receiverCandidate", data.senderSocketID, data.receiverSocketID)
         try {
-            const senderPC = senderPCs[data.senderSocketID].filter(
+            const senderPC = await senderPCs[data.senderSocketID].filter(
                 (sPC) => sPC.id === data.receiverSocketID
             )[0]
             await senderPC.pc.addIceCandidate(
-                new wrtc.RTCIceCandidate(data.candidate)
+                await new wrtc.RTCIceCandidate(data.candidate)
             )
         } catch (error) {
             // console.log("receiverCandidate error")
