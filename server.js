@@ -92,6 +92,7 @@ const createReceiverPeerConnection = (socketID, socket, roomID) => {
     const pc = new wrtc.RTCPeerConnection(pc_config)
 
     pc.onicecandidate = (e) => {
+        if (!e.candidate) return;
         console.log(`socketID: ${socketID}'s receiverPeerConnection icecandidate`)
         socket.to(socketID).emit("getSenderCandidate", {
             candidate: e.candidate
@@ -150,6 +151,7 @@ const createSenderPeerConnection = (
     // console.log("senderPC saved")
 
     pc.onicecandidate = (e) => {
+        if (!e.candidate) return;
         console.log(`socketID: (${receiverSocketID})'s senderPeerConnection icecandidate`)
         socket.to(receiverSocketID).emit("getReceiverCandidate", {
             id: senderSocketID,
