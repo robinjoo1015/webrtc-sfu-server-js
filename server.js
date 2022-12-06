@@ -328,7 +328,7 @@ io.on("connection", (socket) => {
                 socket,
                 data.roomID
             )
-            pc = await senderPCs[data.senderSocketID].filter((user)=>user.id==receiverSocketID)[0].pc
+            pc = await senderPCs[data.senderSocketID].filter((user)=>user.id==data.receiverSocketID)[0].pc
             await pc.setRemoteDescription(data.sdp)
             console.log('receiverOffer setRemoteDescription', data.senderSocketID, data.receiverSocketID)
             let sdp = await pc.createAnswer({
