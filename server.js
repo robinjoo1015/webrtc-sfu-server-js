@@ -82,6 +82,19 @@ const pc_config = {
                 "stun:stun3.l.google.com:19302",
                 "stun:stun4.l.google.com:19302",
               ],
+        },
+        {
+            "username":"dZQ61rW05ALZ0LdCvKmEBM9IOYeRLUoxAH6AXYAyP3pLcchJ4pur56flbAGh9vDLAAAAAGOQkJ1yb2JpbmpvbzEwMTU=",
+            "urls":[
+              "stun:ntk-turn-1.xirsys.com",
+              "turn:ntk-turn-1.xirsys.com:80?transport=udp",
+              "turn:ntk-turn-1.xirsys.com:3478?transport=udp",
+              "turn:ntk-turn-1.xirsys.com:80?transport=tcp",
+              "turn:ntk-turn-1.xirsys.com:3478?transport=tcp",
+              "turns:ntk-turn-1.xirsys.com:443?transport=tcp",
+              "turns:ntk-turn-1.xirsys.com:5349?transport=tcp"
+            ],
+            "credential":"6e538dd4-7630-11ed-b093-0242ac120004"
         }
     ]
 }
@@ -98,7 +111,7 @@ const createReceiverPeerConnection = async (socketID, socket, roomID) => {
 
     pc.onicecandidate = (e) => {
         console.log(`socketID: ${socketID}'s receiverPeerConnection icecandidate`, e.candidate)
-        if (!e.candidate) return;
+        // if (!e.candidate) return;
         socket.to(socketID).emit("getSenderCandidate", {
             candidate: e.candidate
         })
@@ -160,7 +173,7 @@ const createSenderPeerConnection = async (
 
     pc.onicecandidate = (e) => {
         console.log(`socketID: (${receiverSocketID})'s senderPeerConnection icecandidate`)
-        if (!e.candidate) return;
+        // if (!e.candidate) return;
         socket.to(receiverSocketID).emit("getReceiverCandidate", {
             id: senderSocketID,
             candidate: e.candidate,
