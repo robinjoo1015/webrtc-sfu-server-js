@@ -105,13 +105,16 @@ const createReceiverPeerConnection = async (socketID, socket, roomID) => {
     console.log('createReceiverPeerConnection', socketID, roomID)
 
     const pc = await new wrtc.RTCPeerConnection(pc_config)
-    receiverPCs[socketID] = pc
 
     console.log('new receiver pc created', socketID)
 
-    pc.onicecandidate = (e) => {
+    pc.onicecandidate = async(e) => {
         console.log(`socketID: ${socketID}'s receiverPeerConnection icecandidate`, e.candidate)
         // if (!e.candidate) return;
+        const timer = ms => new Promise(res => setTimeout(res, ms))
+        while(receiverPCs[socketID].localDescription === null) {
+            await timer(1)
+        }
         socket.to(socketID).emit("getSenderCandidate", {
             candidate: e.candidate
         })
@@ -143,7 +146,7 @@ const createReceiverPeerConnection = async (socketID, socket, roomID) => {
         console.log("emitted userEnter", socketID)
     }
 
-    // receiverPCs[socketID] = pc
+    receiverPCs[socketID] = pc
     // socketIDMap[socket.id] = socketID
 
     return pc
@@ -160,20 +163,13 @@ const createSenderPeerConnection = async (
 
     console.log('new sender pc created', senderSocketID, receiverSocketID)
 
-    if (senderPCs[senderSocketID]) {
-        // senderPCs[senderSocketID].filter((user) => user.id !== receiverSocketID)
-        senderPCs[senderSocketID].push({ id: receiverSocketID, pc })
-    } else {
-        senderPCs = {
-            ...senderPCs,
-            [senderSocketID]: [{ id: receiverSocketID, pc }],
-        }
-    }
-    console.log("senderPC saved")
-
-    pc.onicecandidate = (e) => {
+    pc.onicecandidate = async(e) => {
         console.log(`socketID: (${receiverSocketID})'s senderPeerConnection icecandidate`)
         // if (!e.candidate) return;
+        const timer = ms => new Promise(res => setTimeout(res, ms))
+        while(pc.localDescription===null) {
+            await timer(1)
+        }
         socket.to(receiverSocketID).emit("getReceiverCandidate", {
             id: senderSocketID,
             candidate: e.candidate,
@@ -190,6 +186,17 @@ const createSenderPeerConnection = async (
         pc.addTrack(track, sendUser.stream)
     })
     console.log('sender pc addtrack')
+    
+    if (senderPCs[senderSocketID]) {
+        // senderPCs[senderSocketID].filter((user) => user.id !== receiverSocketID)
+        senderPCs[senderSocketID].push({ id: receiverSocketID, pc })
+    } else {
+        senderPCs = {
+            ...senderPCs,
+            [senderSocketID]: [{ id: receiverSocketID, pc }],
+        }
+    }
+    console.log("senderPC saved")
 
     return pc
 }
@@ -320,7 +327,10 @@ io.on("connection", (socket) => {
             // await pc.addIceCandidate(new wrtc.RTCIceCandidate(data.candidate))
             */ // error
             const timer = ms => new Promise(res => setTimeout(res, ms))
-            if (!receiverPCs[data.senderSocketID]) {
+            while (!receiverPCs[data.senderSocketID]) {
+                await timer(1)
+            }
+            while (receiverPCs[data.senderSocketID].localDescription === null) {
                 await timer(1)
             }
 
@@ -364,7 +374,13 @@ io.on("connection", (socket) => {
         console.log("on receiverCandidate", data.senderSocketID, data.receiverSocketID)
         try {
             const timer = ms => new Promise(res => setTimeout(res, ms))
-            if (!senderPCs[data.senderSocketID]) {
+            while (!senderPCs[data.senderSocketID]) {
+                await timer(1)
+            }
+            while (senderPCs[data.senderSocketID].filter((sPC)=>sPC.id===data.receiverSocketID).length === 0) {
+                await timer(1)
+            }
+            while (senderPCs[data.senderSocketID].filter((sPC) => sPC.id === data.receiverSocketID)[0].pc.localDescription === null) {
                 await timer(1)
             }
 
