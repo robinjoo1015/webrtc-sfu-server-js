@@ -74,17 +74,17 @@ let socketToRoom = {}
 
 const pc_config = {
     iceServers: [
+        // {
+        //     urls: [
+        //         "stun:stun.l.google.com:19302",
+        //         "stun:stun1.l.google.com:19302",
+        //         "stun:stun2.l.google.com:19302",
+        //         "stun:stun3.l.google.com:19302",
+        //         "stun:stun4.l.google.com:19302",
+        //       ],
+        // },
         {
-            urls: [
-                "stun:stun.l.google.com:19302",
-                "stun:stun1.l.google.com:19302",
-                "stun:stun2.l.google.com:19302",
-                "stun:stun3.l.google.com:19302",
-                "stun:stun4.l.google.com:19302",
-              ],
-        },
-        {
-            "username":"dZQ61rW05ALZ0LdCvKmEBM9IOYeRLUoxAH6AXYAyP3pLcchJ4pur56flbAGh9vDLAAAAAGOQkJ1yb2JpbmpvbzEwMTU=",
+            "username":"u-SD8l77k-U-ItC6MMVo1aoAOHVCcmZOIHbHrfiRLkOsw1GF_J-uILRGV7TAGUYpAAAAAGOQon1yb2JpbmpvbzEwMTU=",
             "urls":[
               "stun:ntk-turn-1.xirsys.com",
               "turn:ntk-turn-1.xirsys.com:80?transport=udp",
@@ -94,8 +94,8 @@ const pc_config = {
               "turns:ntk-turn-1.xirsys.com:443?transport=tcp",
               "turns:ntk-turn-1.xirsys.com:5349?transport=tcp"
             ],
-            "credential":"6e538dd4-7630-11ed-b093-0242ac120004"
-        }
+            "credential":"15c61834-763b-11ed-8083-0242ac120004"
+          }
     ]
 }
 
