@@ -355,8 +355,8 @@ io.on("connection", (socket) => {
             await pc.setRemoteDescription(data.sdp)
             console.log('receiverOffer setRemoteDescription', data.senderSocketID, data.receiverSocketID)
             let sdp = await pc.createAnswer({
-                offerToReceiveAudio: true,
-                offerToReceiveVideo: true
+                offerToReceiveAudio: false,
+                offerToReceiveVideo: false
             })
             await pc.setLocalDescription(sdp)
             console.log('receiverOffer setLocalDescription', data.senderSocketID, data.receiverSocketID)
