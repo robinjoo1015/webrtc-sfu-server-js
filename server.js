@@ -115,9 +115,9 @@ const createReceiverPeerConnection = async (socketID, socket, roomID) => {
         while(!receiverPCs[socketID]) {
             await timer(1)
         }
-        while(receiverPCs[socketID].localDescription === null) {
-            await timer(1)
-        }
+        // while(receiverPCs[socketID].localDescription === null) {
+        //     await timer(1)
+        // }
         socket.to(socketID).emit("getSenderCandidate", {
             candidate: e.candidate
         })
@@ -169,10 +169,10 @@ const createSenderPeerConnection = async (
     pc.onicecandidate = async(e) => {
         console.log(`socketID: (${receiverSocketID})'s senderPeerConnection icecandidate`)
         // if (!e.candidate) return;
-        const timer = ms => new Promise(res => setTimeout(res, ms))
-        while(pc.localDescription===null) {
-            await timer(1)
-        }
+        // const timer = ms => new Promise(res => setTimeout(res, ms))
+        // while(pc.localDescription===null) {
+        //     await timer(1)
+        // }
         socket.to(receiverSocketID).emit("getReceiverCandidate", {
             id: senderSocketID,
             candidate: e.candidate,
@@ -333,9 +333,9 @@ io.on("connection", (socket) => {
             while (!receiverPCs[data.senderSocketID]) {
                 await timer(1)
             }
-            while (receiverPCs[data.senderSocketID].localDescription === null) {
-                await timer(1)
-            }
+            // while (receiverPCs[data.senderSocketID].localDescription === null) {
+            //     await timer(1)
+            // }
 
             await receiverPCs[data.senderSocketID].addIceCandidate(new wrtc.RTCIceCandidate(data.candidate))
             console.log('senderCandidate addIceCandidate receiverPC', data.senderSocketID)
@@ -383,9 +383,9 @@ io.on("connection", (socket) => {
             while (senderPCs[data.senderSocketID].filter((sPC)=>sPC.id===data.receiverSocketID).length === 0) {
                 await timer(1)
             }
-            while (senderPCs[data.senderSocketID].filter((sPC) => sPC.id === data.receiverSocketID)[0].pc.localDescription === null) {
-                await timer(1)
-            }
+            // while (senderPCs[data.senderSocketID].filter((sPC) => sPC.id === data.receiverSocketID)[0].pc.localDescription === null) {
+            //     await timer(1)
+            // }
 
             const senderPC = await senderPCs[data.senderSocketID].filter( // error
                 (sPC) => sPC.id === data.receiverSocketID
