@@ -300,15 +300,17 @@ io.on("connection", (socket) => {
 
             // await pc.setRemoteDescription(data.sdp) // (pc use x)
             await receiverPCs[data.senderSocketID].setRemoteDescription(data.sdp) // access saved array element
-            await console.log("senderOffer setRemoteDescription")
+            console.log("senderOffer setRemoteDescription")
 
-            let sdp = await pc.createAnswer({
+            let sdp = await receiverPCs[data.senderSocketID].createAnswer({
                 offerToReceiveAudio: true,
                 offerToReceiveVideo: true
+            }).then((offer) => {
+                receiverPCs[data.senderSocketID].setLocalDescription(sdp) // access saved array element
             })
             // await pc.setLocalDescription(sdp) // (pc use x)
-            await receiverPCs[data.senderSocketID].setLocalDescription(sdp) // access saved array element
-            await console.log("senderOffer setLocalDescription")
+            // await receiverPCs[data.senderSocketID].setLocalDescription(sdp) // access saved array element
+            console.log("senderOffer setLocalDescription")
 
             // receiverPCs[data.senderSocketID] = await pc // save in createReceiverPeerConnection function
             // await console.log("receiverPC saved")
@@ -337,7 +339,7 @@ io.on("connection", (socket) => {
                 await timer(1)
             }
 
-            await receiverPCs[data.senderSocketID].addIceCandidate(await new wrtc.RTCIceCandidate(data.candidate))
+            await receiverPCs[data.senderSocketID].addIceCandidate(new wrtc.RTCIceCandidate(data.candidate))
             console.log('senderCandidate addIceCandidate receiverPC', data.senderSocketID)
         } catch (error) {
             // console.log('senderCandidate error')
@@ -391,7 +393,7 @@ io.on("connection", (socket) => {
                 (sPC) => sPC.id === data.receiverSocketID
             )[0].pc
             await senderPC.addIceCandidate(
-                await new wrtc.RTCIceCandidate(data.candidate)
+                new wrtc.RTCIceCandidate(data.candidate)
             )
             console.log('receiverCandidate addIceCandidate senderPC', data.receiverSocketID)
         } catch (error) {
