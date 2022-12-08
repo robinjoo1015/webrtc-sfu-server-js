@@ -299,7 +299,7 @@ io.on("connection", (socket) => {
             ) // already saved pc in array (*modified)
 
             // await pc.setRemoteDescription(data.sdp) // (pc use x)
-            await receiverPCs[data.senderSocketID].setRemoteDescription(data.sdp) // access saved array element
+            receiverPCs[data.senderSocketID].setRemoteDescription(data.sdp) // access saved array element
             console.log("senderOffer setRemoteDescription")
 
             let sdp = await receiverPCs[data.senderSocketID].createAnswer({
@@ -307,7 +307,7 @@ io.on("connection", (socket) => {
                 offerToReceiveVideo: true
             })
             // await pc.setLocalDescription(sdp) // (pc use x)
-            await receiverPCs[data.senderSocketID].setLocalDescription(sdp) // access saved array element
+            receiverPCs[data.senderSocketID].setLocalDescription(sdp) // access saved array element
             console.log("senderOffer setLocalDescription")
 
             // receiverPCs[data.senderSocketID] = await pc // save in createReceiverPeerConnection function
@@ -355,13 +355,13 @@ io.on("connection", (socket) => {
                 data.roomID
             )
             pc = await senderPCs[data.senderSocketID].filter((user)=>user.id==data.receiverSocketID)[0].pc
-            await pc.setRemoteDescription(data.sdp)
+            pc.setRemoteDescription(data.sdp)
             console.log('receiverOffer setRemoteDescription', data.senderSocketID, data.receiverSocketID)
             let sdp = await pc.createAnswer({
                 offerToReceiveAudio: false,
                 offerToReceiveVideo: false
             })
-            await pc.setLocalDescription(sdp)
+            pc.setLocalDescription(sdp)
             console.log('receiverOffer setLocalDescription', data.senderSocketID, data.receiverSocketID)
             io.to(data.receiverSocketID).emit("getReceiverAnswer", {
                 id: data.senderSocketID,
