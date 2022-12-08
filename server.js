@@ -303,8 +303,8 @@ io.on("connection", (socket) => {
             await console.log("senderOffer setRemoteDescription")
 
             let sdp = await pc.createAnswer({
-                offerToReceiveAudio: false,
-                offerToReceiveVideo: false
+                offerToReceiveAudio: true,
+                offerToReceiveVideo: true
             })
             // await pc.setLocalDescription(sdp) // (pc use x)
             await receiverPCs[data.senderSocketID].setLocalDescription(sdp) // access saved array element
@@ -358,8 +358,8 @@ io.on("connection", (socket) => {
             await pc.setRemoteDescription(data.sdp)
             console.log('receiverOffer setRemoteDescription', data.senderSocketID, data.receiverSocketID)
             let sdp = await pc.createAnswer({
-                offerToReceiveAudio: true,
-                offerToReceiveVideo: true
+                offerToReceiveAudio: false,
+                offerToReceiveVideo: false
             })
             await pc.setLocalDescription(sdp)
             console.log('receiverOffer setLocalDescription', data.senderSocketID, data.receiverSocketID)
