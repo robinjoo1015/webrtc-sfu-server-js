@@ -132,6 +132,16 @@ const createReceiverPeerConnection = async (socketID, socket, roomID) => {
         console.log(e.errorCode, e.errorText)
     }
 
+    // pc.onnegotiationneeded = (e) => {
+    //     pc.createOffer({
+    //         offerToReceiveAudio: true,
+    //         offerToReceiveVideo: true,
+    //     }).then((offer)=>pc.setLocalDescription(offer)).then(()=>{
+    //         socket.join(data.roomID)
+    //         io.to(data.senderSocketID).emit("getSenderAnswer", { sdp: pc.localDescription })
+    //     }).catch((err)=>{console.log(err)})
+    // }
+
     pc.ontrack = (e) => {
         console.log('receiver pc ontrack')
         if (users[roomID]) {
@@ -191,6 +201,18 @@ const createSenderPeerConnection = async (
     pc.onicecandidateerror = (e) => {
         console.log(e.errorCode, e.errorText)
     }
+
+    // pc.onnegotiationneeded = (e) => {
+    //     pc.createOffer({
+    //         offerToReceiveAudio: true,
+    //         offerToReceiveVideo: true,
+    //     }).then((offer)=>pc.setLocalDescription(offer)).then(()=>{
+    //         io.to(receiverSocketID).emit("getReceiverAnswer", {
+    //             id: senderSocketID,
+    //             sdp: pc.localDescription
+    //         })
+    //     }).catch((err)=>{console.log(err)})
+    // }
 
     const sendUser = users[roomID].filter((user) => user.id === senderSocketID)[0]
     await sendUser.stream.getTracks().forEach((track) => {
@@ -323,7 +345,7 @@ io.on("connection", (socket) => {
 
             await socket.join(data.roomID)
             console.log('joined room', data.senderSocketID, data.roomID)
-            await io.to(data.senderSocketID).emit("getSenderAnswer", { sdp })
+            await io.to(data.senderSocketID).emit("getSenderAnswer", { sdp: sdp })
             console.log("emitted getSenderAnswer", data.senderSocketID)
         } catch (error) {
             console.log(error)
