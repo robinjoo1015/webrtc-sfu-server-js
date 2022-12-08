@@ -305,8 +305,8 @@ io.on("connection", (socket) => {
             let sdp = await receiverPCs[data.senderSocketID].createAnswer({
                 offerToReceiveAudio: true,
                 offerToReceiveVideo: true
-            }).then((offer) => {
-                receiverPCs[data.senderSocketID].setLocalDescription(sdp) // access saved array element
+            }).then(async (offer) => {
+                await receiverPCs[data.senderSocketID].setLocalDescription(offer) // access saved array element
             })
             // await pc.setLocalDescription(sdp) // (pc use x)
             // await receiverPCs[data.senderSocketID].setLocalDescription(sdp) // access saved array element
