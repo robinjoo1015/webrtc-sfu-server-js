@@ -128,6 +128,10 @@ const createReceiverPeerConnection = async (socketID, socket, roomID) => {
         console.log("ReceiverPeerConnection IceConnectionStateChange", pc.iceConnectionState, socketID)
     }
 
+    pc.onicecandidateerror = (e) => {
+        console.log(e.errorCode, e.errorText)
+    }
+
     pc.ontrack = (e) => {
         console.log('receiver pc ontrack')
         if (users[roomID]) {
@@ -182,6 +186,10 @@ const createSenderPeerConnection = async (
 
     pc.oniceconnectionstatechange = (e) => {
         console.log("SenderPeerConnection IceConnectionStateChange", pc.iceConnectionState, receiverSocketID, senderSocketID)
+    }
+
+    pc.onicecandidateerror = (e) => {
+        console.log(e.errorCode, e.errorText)
     }
 
     const sendUser = users[roomID].filter((user) => user.id === senderSocketID)[0]
