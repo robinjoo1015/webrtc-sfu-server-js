@@ -74,28 +74,28 @@ let socketToRoom = {}
 
 const pc_config = {
     iceServers: [
-        // {
-        //     urls: [
-        //         "stun:stun.l.google.com:19302",
-        //         "stun:stun1.l.google.com:19302",
-        //         "stun:stun2.l.google.com:19302",
-        //         "stun:stun3.l.google.com:19302",
-        //         "stun:stun4.l.google.com:19302",
-        //       ],
-        // },
         {
-            "username":"u-SD8l77k-U-ItC6MMVo1aoAOHVCcmZOIHbHrfiRLkOsw1GF_J-uILRGV7TAGUYpAAAAAGOQon1yb2JpbmpvbzEwMTU=",
-            "urls":[
-              "stun:ntk-turn-1.xirsys.com",
-              "turn:ntk-turn-1.xirsys.com:80?transport=udp",
-              "turn:ntk-turn-1.xirsys.com:3478?transport=udp",
-              "turn:ntk-turn-1.xirsys.com:80?transport=tcp",
-              "turn:ntk-turn-1.xirsys.com:3478?transport=tcp",
-              "turns:ntk-turn-1.xirsys.com:443?transport=tcp",
-              "turns:ntk-turn-1.xirsys.com:5349?transport=tcp"
-            ],
-            "credential":"15c61834-763b-11ed-8083-0242ac120004"
-          }
+            urls: [
+                "stun:stun.l.google.com:19302",
+                "stun:stun1.l.google.com:19302",
+                "stun:stun2.l.google.com:19302",
+                "stun:stun3.l.google.com:19302",
+                "stun:stun4.l.google.com:19302",
+              ],
+        },
+        // {
+        //     "username":"u-SD8l77k-U-ItC6MMVo1aoAOHVCcmZOIHbHrfiRLkOsw1GF_J-uILRGV7TAGUYpAAAAAGOQon1yb2JpbmpvbzEwMTU=",
+        //     "urls":[
+        //       "stun:ntk-turn-1.xirsys.com",
+        //       "turn:ntk-turn-1.xirsys.com:80?transport=udp",
+        //       "turn:ntk-turn-1.xirsys.com:3478?transport=udp",
+        //       "turn:ntk-turn-1.xirsys.com:80?transport=tcp",
+        //       "turn:ntk-turn-1.xirsys.com:3478?transport=tcp",
+        //       "turns:ntk-turn-1.xirsys.com:443?transport=tcp",
+        //       "turns:ntk-turn-1.xirsys.com:5349?transport=tcp"
+        //     ],
+        //     "credential":"15c61834-763b-11ed-8083-0242ac120004"
+        //   }
     ]
 }
 
@@ -112,6 +112,9 @@ const createReceiverPeerConnection = async (socketID, socket, roomID) => {
         console.log(`socketID: ${socketID}'s receiverPeerConnection icecandidate`, e.candidate)
         // if (!e.candidate) return;
         const timer = ms => new Promise(res => setTimeout(res, ms))
+        while(!receiverPCs[socketID]) {
+            await timer(1)
+        }
         while(receiverPCs[socketID].localDescription === null) {
             await timer(1)
         }
@@ -300,8 +303,8 @@ io.on("connection", (socket) => {
             await console.log("senderOffer setRemoteDescription")
 
             let sdp = await pc.createAnswer({
-                offerToReceiveAudio: true,
-                offerToReceiveVideo: true
+                offerToReceiveAudio: false,
+                offerToReceiveVideo: false
             })
             // await pc.setLocalDescription(sdp) // (pc use x)
             await receiverPCs[data.senderSocketID].setLocalDescription(sdp) // access saved array element
@@ -355,8 +358,8 @@ io.on("connection", (socket) => {
             await pc.setRemoteDescription(data.sdp)
             console.log('receiverOffer setRemoteDescription', data.senderSocketID, data.receiverSocketID)
             let sdp = await pc.createAnswer({
-                offerToReceiveAudio: false,
-                offerToReceiveVideo: false
+                offerToReceiveAudio: true,
+                offerToReceiveVideo: true
             })
             await pc.setLocalDescription(sdp)
             console.log('receiverOffer setLocalDescription', data.senderSocketID, data.receiverSocketID)
